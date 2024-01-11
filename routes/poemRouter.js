@@ -1,46 +1,74 @@
 const express = require('express');
+const Poem = require('../models/poem');
+
 const poemRouter = express.Router();
 
 poemRouter.route('/')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
+.get((req, res, next) => {
+    Poem.find()
+    .then(poems => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(poems);
+    })
+    .catch(err => next(err));
 })
-.get((req, res) => {
-    res.end('This will send all poems to you');
-})
-.post((req, res) => {
-    res.end(`Will add the poem: ${req.body.title} with content: ${req.body.content}`);
+.post((req, res, next) => {
+    Poem.create(req.body)
+    .then(poem => {
+        console.log('Poem uploaded ', poem);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(poem);
+    })
+    .catch(err => next(err));
 })
 .put((req, res) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /poems');
 })
-.delete((req, res) => {
-    res.statusCode = 403;
-    res.end('DELETE operation not supported on /poems');
+.delete((req, res, next) => {
+    Poem.deleteMany()
+    .then(response => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(response);
+    })
+    .catch(err => next(err));
 })
 
 poemRouter.route('/:poemId')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
-})
-.get((req, res) => {
-    res.end('Will send a specific poem');
+.get((req, res, next) => {
+    Poem.findById(req.params.poemId)
+    .then(poem => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(poem);
+    })
 })
 .post((req, res) => {
     res.statusCode = 403;
     res.end(`POST operation not supported on /poems/${req.params.poemId}`);
 })
-.put((req, res) => {
-    res.write(`Editing the poem: ${req.params.poemId}\n`);
-    res.end(`Will update the poem: ${req.body.title} with content: ${req.body.content}`);
+.put((req, res, next) => {
+    Poem.findByIdAndUpdate(req.params.poemId, {
+        $set: req.body
+    }, { new: true })
+    .then(poem => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(poem);
+    })
+    .catch(err => next(err));
 })
-.delete((req, res) => {
-    res.end(`Deleting poem: ${req.params.poemId}`);
+.delete((req, res, next) => {
+    Poem.findByIdAndDelete(req.params.poemId)
+    .then(response => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(response);
+    })
+    .catch(err => next(err));
 });
 
 poemRouter.route('/:poemId/comments')
