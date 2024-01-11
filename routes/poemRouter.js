@@ -72,11 +72,6 @@ poemRouter.route('/:poemId')
 });
 
 poemRouter.route('/:poemId/comments')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
-})
 .get((req, res) => {
     res.end(`Will send all comments on poem: ${req.params.poemId}`);
 })

@@ -1,6 +1,19 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const commentSchema = new Schema({
+    text: {
+        type: String,
+        required: true,
+    },
+    author: {
+        type: String,
+        required: true,
+    },
+}, {
+    timestamps: true,
+});
+
 const poemSchema = new Schema({
     title: {
         type: String,
@@ -11,6 +24,7 @@ const poemSchema = new Schema({
         type: String,
         required: true,
     },
+    comments: [commentSchema],
 }, {
     timestamps: true,
 });
