@@ -72,39 +72,141 @@ poemRouter.route('/:poemId')
 });
 
 poemRouter.route('/:poemId/comments')
-.get((req, res) => {
-    res.end(`Will send all comments on poem: ${req.params.poemId}`);
+.get((req, res, next) => {
+    Poem.findById(req.params.poemId)
+    .then(poem => {
+        if (poem) {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(poem.comments);
+        } else {
+            err = new Error(`Poem ${req.params.poemId} not found`);
+            err.status = 404;
+            return next(err);
+        }
+    })
+    .catch(err => next(err));
 })
-.post((req, res) => {
-    res.end(`Will post a comment to ${req.params.poemId}`);
+.post((req, res, next) => {
+    Poem.findById(req.params.poemId)
+    .then(poem => {
+        if (poem) {
+            poem.comments.push(req.body);
+            poem.save()
+            .then(poem => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(poem);
+            })
+            .catch(err => next(err));
+        } else {
+            err = new Error(`Poem ${req.params.poemId} not found`);
+            err.status = 404;
+            return next(err);
+        }
+    })
+    .catch(err => next(err));
 })
 .put((req, res) => {
     res.statusCode = 403;
     res.end(`PUT operation not supported on /poems/${req.params.poemId}/comments`);
 })
-.delete((req, res) => {
-    res.statusCode = 403;
-    res.end(`DELETE operation not supported on /poems/${req.params.poemId}/comments`);
+.delete((req, res, next) => {
+    Poem.findById(req.params.poemId)
+    .then(poem => {
+        if (poem) {
+            for (let i = (poem.comments.length-1); i >= 0; i--) {
+                poem.comments.id(poem.comments[i]._id).remove();
+            }
+            poem.save()
+            .then(poem => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(poem);
+            })
+            .catch(err => next(err));
+        } else {
+            err = new Error(`Poem ${req.params.poemId} not found`);
+            err.status = 404;
+            return next(err);
+        }
+    })
+    .catch(err => next(err));
 })
 
 poemRouter.route('/:poemId/comments/:commentId')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
-})
-.get((req, res) => {
-    res.end(`Will send a specific comment: ${req.params.commentId}`);
+.get((req, res, next) => {
+    Poem.findById(req.params.poemId)
+    .then(poem => {
+        if (poem && poem.comments.id(req.params.commentId)) {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(poem.comments.id(req.params.commentId));
+        } else if (!poem) {
+            err = new Error(`Poem ${req.params.poemId} not found`);
+            err.status = 404;
+            return next(err);
+        } else {
+            err = new Error(`Comment ${req.params.commentId} not found`);
+            err.status = 404;
+            return next(err);
+        }
+    })
+    .catch(err => next(err));
 })
 .post((req, res) => {
     res.statusCode = 403;
     res.end(`POST operation not supported on /poems/${req.params.poemId}/comments/${req.params.commentId}`);
 })
-.put((req, res) => {
-    res.end(`Will update comment: ${req.params.commentId}`);
+.put((req, res, next) => {
+    Poem.findById(req.params.poemId)
+    .then(poem => {
+        if (poem && poem.comments.id(req.params.commentId)) {
+            if (req.body.text) {
+                poem.comments.id(req.params.commentId).text = req.body.text;
+            }
+            poem.save()
+            .then(poem => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(poem);
+            })
+            .catch(err => next(err));
+        } else if (!poem) {
+            err = new Error(`Poem ${req.params.poemId} not found`);
+            err.status = 404;
+            return next(err);
+        } else {
+            err = new Error(`Comment ${req.params.commentId} not found`);
+            err.status = 404;
+            return next(err);
+        }
+    })
+    .catch(err => next(err));
 })
-.delete((req, res) => {
-    res.end(`Will delete comment: ${req.params.commentId}`);
+.delete((req, res, next) => {
+    Poem.findById(req.params.poemId)
+    .then(poem => {
+        if (poem && poem.comments.id(req.params.commentId)) {
+            poem.comments.id(req.params.commentId).remove();
+            poem.save()
+            .then(poem => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(poem);
+            })
+            .catch(err => next(err));
+        } else if (!poem) {
+            err = new Error(`Poem ${req.params.poemId} not found`);
+            err.status = 404;
+            return next(err);
+        } else {
+            err = new Error(`Comment ${req.params.commentId} not found`);
+            err.status = 404;
+            return next(err);
+        }
+    })
+    .catch(err => next(err));
 })
 
 module.exports = poemRouter;
