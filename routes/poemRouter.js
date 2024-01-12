@@ -116,7 +116,7 @@ poemRouter.route('/:poemId/comments')
     .then(poem => {
         if (poem) {
             for (let i = (poem.comments.length-1); i >= 0; i--) {
-                poem.comments.id(poem.comments[i]._id).remove();
+                poem.comments.id(poem.comments[i]._id).deleteOne();
             }
             poem.save()
             .then(poem => {
@@ -188,7 +188,7 @@ poemRouter.route('/:poemId/comments/:commentId')
     Poem.findById(req.params.poemId)
     .then(poem => {
         if (poem && poem.comments.id(req.params.commentId)) {
-            poem.comments.id(req.params.commentId).remove();
+            poem.comments.id(req.params.commentId).deleteOne();
             poem.save()
             .then(poem => {
                 res.statusCode = 200;
