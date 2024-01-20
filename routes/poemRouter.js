@@ -7,6 +7,7 @@ const poemRouter = express.Router();
 poemRouter.route('/')
 .get((req, res, next) => {
     Poem.find()
+    .populate('comments.author')
     .then(poems => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
@@ -41,6 +42,7 @@ poemRouter.route('/')
 poemRouter.route('/:poemId')
 .get((req, res, next) => {
     Poem.findById(req.params.poemId)
+    .populate('comments.author')
     .then(poem => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
@@ -75,6 +77,7 @@ poemRouter.route('/:poemId')
 poemRouter.route('/:poemId/comments')
 .get((req, res, next) => {
     Poem.findById(req.params.poemId)
+    .populate('comments.author')
     .then(poem => {
         if (poem) {
             res.statusCode = 200;
@@ -92,6 +95,7 @@ poemRouter.route('/:poemId/comments')
     Poem.findById(req.params.poemId)
     .then(poem => {
         if (poem) {
+            req.body.author = req.user._id;
             poem.comments.push(req.body);
             poem.save()
             .then(poem => {
@@ -138,6 +142,7 @@ poemRouter.route('/:poemId/comments')
 poemRouter.route('/:poemId/comments/:commentId')
 .get((req, res, next) => {
     Poem.findById(req.params.poemId)
+    .populate('comments.author')
     .then(poem => {
         if (poem && poem.comments.id(req.params.commentId)) {
             res.statusCode = 200;
