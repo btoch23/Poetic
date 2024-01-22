@@ -1,11 +1,13 @@
 const express = require('express');
 const Poem = require('../models/poem');
 const authenticate = require('../authenticate');
+const cors = require('./cors');
 
 const poemRouter = express.Router();
 
 poemRouter.route('/')
-.get((req, res, next) => {
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+.get(cors.cors, (req, res, next) => {
     Poem.find()
     .populate('comments.author')
     .then(poems => {
@@ -15,7 +17,7 @@ poemRouter.route('/')
     })
     .catch(err => next(err));
 })
-.post(authenticate.verifyUser, (req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Poem.create(req.body)
     .then(poem => {
         console.log('Poem uploaded ', poem);
@@ -25,11 +27,11 @@ poemRouter.route('/')
     })
     .catch(err => next(err));
 })
-.put(authenticate.verifyUser, (req, res) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /poems');
 })
-.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.deleteMany()
     .then(response => {
         res.statusCode = 200;
@@ -40,7 +42,8 @@ poemRouter.route('/')
 })
 
 poemRouter.route('/:poemId')
-.get((req, res, next) => {
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+.get(cors.cors, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .populate('comments.author')
     .then(poem => {
@@ -49,11 +52,11 @@ poemRouter.route('/:poemId')
         res.json(poem);
     })
 })
-.post(authenticate.verifyUser, (req, res) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`POST operation not supported on /poems/${req.params.poemId}`);
 })
-.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findByIdAndUpdate(req.params.poemId, {
         $set: req.body
     }, { new: true })
@@ -64,7 +67,7 @@ poemRouter.route('/:poemId')
     })
     .catch(err => next(err));
 })
-.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findByIdAndDelete(req.params.poemId)
     .then(response => {
         res.statusCode = 200;
@@ -75,7 +78,8 @@ poemRouter.route('/:poemId')
 });
 
 poemRouter.route('/:poemId/comments')
-.get((req, res, next) => {
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+.get(cors.cors, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .populate('comments.author')
     .then(poem => {
@@ -91,7 +95,7 @@ poemRouter.route('/:poemId/comments')
     })
     .catch(err => next(err));
 })
-.post(authenticate.verifyUser, (req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .then(poem => {
         if (poem) {
@@ -112,11 +116,11 @@ poemRouter.route('/:poemId/comments')
     })
     .catch(err => next(err));
 })
-.put(authenticate.verifyUser, (req, res) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`PUT operation not supported on /poems/${req.params.poemId}/comments`);
 })
-.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .then(poem => {
         if (poem) {
@@ -140,7 +144,8 @@ poemRouter.route('/:poemId/comments')
 })
 
 poemRouter.route('/:poemId/comments/:commentId')
-.get((req, res, next) => {
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+.get(cors.cors, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .populate('comments.author')
     .then(poem => {
@@ -160,11 +165,11 @@ poemRouter.route('/:poemId/comments/:commentId')
     })
     .catch(err => next(err));
 })
-.post(authenticate.verifyUser, (req, res) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`POST operation not supported on /poems/${req.params.poemId}/comments/${req.params.commentId}`);
 })
-.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .then(poem => {
         if (poem && poem.comments.id(req.params.commentId)) {
@@ -190,7 +195,7 @@ poemRouter.route('/:poemId/comments/:commentId')
     })
     .catch(err => next(err));
 })
-.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .then(poem => {
         if (poem && poem.comments.id(req.params.commentId)) {
