@@ -1,6 +1,12 @@
 # Overview
 
-Poetic is a platform powered by Node.js and Express to provide poets with a place to share and discuss their writing with fellow artists
+Poetic is a platform powered by Node.js and Express to provide poets with a place to share and discuss their writing with fellow artists. 
+
+# Technology Stack
+- **Node.js**
+- **Express**
+- **MongoDB**
+- **Mongoose**
 
 # Routers and Endpoints
 
@@ -29,10 +35,10 @@ Manages commenting on poems
 Manages user-related operations
 
 - **GET** `/users`: Retrieve all users.
+- **POST** `/users/signup`: Register a new user.
+- **POST** `/users/login`: Sign a user in.
 - **GET** `/users/:userId`: Retrieve a specific user.
-- **POST** `/users`: Register a new user.
 - **PUT** `/users/:userId`: Update user information.
-- **DELETE** `/users`: Delete all users.
 - **DELETE** `/users/:userId`: Delete a specific user.
 
 # Contact Me
