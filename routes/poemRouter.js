@@ -29,7 +29,7 @@ poemRouter.route('/')
     res.statusCode = 403;
     res.end('PUT operation not supported on /poems');
 })
-.delete(authenticate.verifyUser, (req, res, next) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.deleteMany()
     .then(response => {
         res.statusCode = 200;
@@ -53,7 +53,7 @@ poemRouter.route('/:poemId')
     res.statusCode = 403;
     res.end(`POST operation not supported on /poems/${req.params.poemId}`);
 })
-.put(authenticate.verifyUser, (req, res, next) => {
+.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findByIdAndUpdate(req.params.poemId, {
         $set: req.body
     }, { new: true })
@@ -64,7 +64,7 @@ poemRouter.route('/:poemId')
     })
     .catch(err => next(err));
 })
-.delete(authenticate.verifyUser, (req, res, next) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findByIdAndDelete(req.params.poemId)
     .then(response => {
         res.statusCode = 200;
@@ -116,7 +116,7 @@ poemRouter.route('/:poemId/comments')
     res.statusCode = 403;
     res.end(`PUT operation not supported on /poems/${req.params.poemId}/comments`);
 })
-.delete(authenticate.verifyUser, (req, res, next) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .then(poem => {
         if (poem) {
@@ -164,7 +164,7 @@ poemRouter.route('/:poemId/comments/:commentId')
     res.statusCode = 403;
     res.end(`POST operation not supported on /poems/${req.params.poemId}/comments/${req.params.commentId}`);
 })
-.put(authenticate.verifyUser, (req, res, next) => {
+.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .then(poem => {
         if (poem && poem.comments.id(req.params.commentId)) {
@@ -190,7 +190,7 @@ poemRouter.route('/:poemId/comments/:commentId')
     })
     .catch(err => next(err));
 })
-.delete(authenticate.verifyUser, (req, res, next) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Poem.findById(req.params.poemId)
     .then(poem => {
         if (poem && poem.comments.id(req.params.commentId)) {
