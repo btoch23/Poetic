@@ -16,6 +16,38 @@ router.get('/', authenticate.verifyUser, function(req, res, next) {
     .catch(err => next(err));
 });
 
+router.get('/:userId', authenticate.verifyUser, (req, res, next) => {
+    User.findById(req.params.userId)
+    .then(user => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    })
+    .catch(err => next(err));
+});
+
+router.put('/:userId', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+    User.findByIdAndUpdate(req.params.userId, {
+        $set: req.body
+    }, { new: true })
+    .then(user => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    })
+    .catch(err => next(err));
+})
+
+router.delete('/:userId', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+    User.findByIdAndDelete(req.params.userId)
+    .then(response => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(response);
+    })
+    .catch(err => next(err));
+})
+
 router.post('/signup', (req, res) => {
     User.register(
         new User({username: req.body.username}),
