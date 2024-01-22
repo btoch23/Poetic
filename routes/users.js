@@ -5,7 +5,7 @@ const authenticate = require('../authenticate');
 
 const router = express.Router();
 
-/* GET users listing. */
+// GET all users
 router.get('/', authenticate.verifyUser, function(req, res, next) {
     User.find()
     .then(users => {
@@ -15,7 +15,7 @@ router.get('/', authenticate.verifyUser, function(req, res, next) {
     })
     .catch(err => next(err));
 });
-
+// GET specific user
 router.get('/:userId', authenticate.verifyUser, (req, res, next) => {
     User.findById(req.params.userId)
     .then(user => {
@@ -25,7 +25,7 @@ router.get('/:userId', authenticate.verifyUser, (req, res, next) => {
     })
     .catch(err => next(err));
 });
-
+//Update specific user
 router.put('/:userId', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     User.findByIdAndUpdate(req.params.userId, {
         $set: req.body
@@ -37,7 +37,7 @@ router.put('/:userId', authenticate.verifyUser, authenticate.verifyAdmin, (req, 
     })
     .catch(err => next(err));
 })
-
+//DELETE specific user
 router.delete('/:userId', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     User.findByIdAndDelete(req.params.userId)
     .then(response => {
@@ -47,7 +47,7 @@ router.delete('/:userId', authenticate.verifyUser, authenticate.verifyAdmin, (re
     })
     .catch(err => next(err));
 })
-
+//Register new user
 router.post('/signup', (req, res) => {
     User.register(
         new User({username: req.body.username}),
@@ -86,7 +86,7 @@ router.post('/signup', (req, res) => {
     );
 });
 
-
+//Login a user
 router.post('/login', passport.authenticate('local'), (req, res) => {
     const token = authenticate.getToken({_id: req.user._id});
     res.statusCode = 200;
