@@ -24,6 +24,10 @@ const poemSchema = new Schema({
         type: String,
         required: true,
     },
+    author: {
+        type: String,
+        required: true,
+    },
     comments: [commentSchema],
 }, {
     timestamps: true,
