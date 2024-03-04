@@ -1,9 +1,6 @@
 # Overview
 
 Poetic is a platform powered by Node.js and Express to provide poets with a place to share and discuss their writing with fellow artists. 
-<br/>
-<br/>
-Front-End Repo: https://github.com/btoch23/Poetic-Frontend
 
 # Technology Stack
 - **Node.js**
